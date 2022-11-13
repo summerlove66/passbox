@@ -8,7 +8,7 @@
   
   
 - 安装python(>3) 库, pip intsall -r requirements.txt
--  设置快捷脚本(因为我用的是windows,这里以passbox.bat做示范) 并 添加本目录到 环境变量
+-  设置快捷脚本(这里以window环境下 passbox.bat做示范) 并 添加本目录到 环境变量(PASSBOX)
 -  命令行 运行 *passbox init*  生成密钥和相关文件夹
   
 ### 使用 & 迁移
