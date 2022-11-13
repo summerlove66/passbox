@@ -47,12 +47,12 @@ def generate_private_key(aes_encrypted_content):
     with open(RSA_PRIVATE_KEY_FILE, "w") as f:
         f.write(RSA_BEGIN_SYMBOL+ aes_encrypted_content + RSA_END_SYMBOL)
 
-def pushes(fold_path,comment_info ,repo_name, branch_name):
+def pushes(fold_path,comment_info , branch_name):
     os.chdir(fold_path)
     subprocess.run("git add  .")
     #git.stdin.write("programming\n")
     subprocess.run("git commit -m " + comment_info )
-    git = subprocess.Popen("git push -f  {}  {}".format(repo_name,branch_name),
+    git = subprocess.Popen("git push -f  origin {}".format(branch_name),
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                         stdin=subprocess.PIPE,
@@ -68,8 +68,8 @@ def pushes(fold_path,comment_info ,repo_name, branch_name):
 def pulls():
    
     subprocess.run("git clone -b {} {} {}".format(SETTING_ITEM["rsa"]["git"]["branch"], SETTING_ITEM["rsa"]["git"]["remote"],RSA_PAIR_PATH))
-    
-    #subprocess.run("git clone -b {} {} {}".format(SETTING_ITEM["pass"]["git"]["branch"] ,SETTING_ITEM["pass"]["git"]["remote"],PASS_REPO_PATH))
+    subprocess.run("git clone -b {} {} {}".format(SETTING_ITEM["pass"]["git"]["branch"] ,SETTING_ITEM["pass"]["git"]["remote"],PASS_REPO_PATH))
+
 # get the original private key 
 def get_rsa_private_key_from_aes_key(aes_key):
     if aes_key != "-":
@@ -89,7 +89,7 @@ def reset_rsa_private_aes_key(old_key,new_key):
          if "y" != input("will expose your private key ,are u sure(y|n)\n"):
             exit
     generate_private_key(private_key_text)
-    pushes("key_pair","rsa","rsa",SETTING_ITEM["rsa"]["git"]["branch"])
+    pushes("key_pair","rsa",SETTING_ITEM["rsa"]["git"]["branch"])
  
     print("reset sucessful! ")
 
@@ -110,7 +110,7 @@ def encrypt_pass(domain,msg):
     os.chdir(PASS_REPO_PATH)
     with open(domain ,mode="w") as f:
         f.write(cipher_text)
-    pushes(".", domain, "pass", SETTING_ITEM["pass"]["git"]["branch"])   
+    pushes(".", domain, SETTING_ITEM["pass"]["git"]["branch"])   
 
 def decrypt_pass(domain,aes_key):
     domains = os.listdir(PASS_REPO_PATH)
