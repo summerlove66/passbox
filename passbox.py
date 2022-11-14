@@ -105,12 +105,14 @@ def decrypt_data(encrypt_msg ,aes_key):
     back_text = cipher.decrypt(base64.b64decode(encrypt_msg), 0)
     return back_text.decode('utf-8')
 
-def encrypt_pass(domain,msg):
+def encrypt_pass(domain,msg, upload=""):
     cipher_text =encrypt_data(msg)
     os.chdir(PASS_REPO_PATH)
     with open(domain ,mode="w") as f:
         f.write(cipher_text)
-    pushes(".", domain, SETTING_ITEM["rsa"]["git"]["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])   
+    if upload !="no":
+        pushes(".", domain, SETTING_ITEM["rsa"]["git"]["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])   
+    print("encrypt sucessful! ")
 
 def decrypt_pass(domain,aes_key):
     domains = os.listdir(PASS_REPO_PATH)
@@ -127,7 +129,6 @@ def decrypt_pass(domain,aes_key):
     with open(os.path.join(PASS_REPO_PATH,target_domain)) as f:
         text = f.read()
         print(decrypt_data(text,aes_key))
-
 
 
 if __name__ == '__main__':
