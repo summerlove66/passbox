@@ -1,0 +1,18 @@
+{   
+    
+    "pass": {
+        "git": {
+            
+            "remote": "git@bitbucket.org:user/xxxx.git",
+            "branch": "master",
+            "localBranch": "master"
+        }
+    },
+    "rsa": {
+        "git": {
+            "remote": "git@github.com:user/xxxxxxx.git",
+            "branch": "master",
+            "localBranch": "master"
+        }
+    }
+}
