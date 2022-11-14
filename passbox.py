@@ -47,12 +47,12 @@ def generate_private_key(aes_encrypted_content):
     with open(RSA_PRIVATE_KEY_FILE, "w") as f:
         f.write(RSA_BEGIN_SYMBOL+ aes_encrypted_content + RSA_END_SYMBOL)
 
-def pushes(fold_path,comment_info , branch_name):
+def pushes(fold_path,comment_info ,local_branch_name,remote_branch_name):
     os.chdir(fold_path)
     subprocess.run("git add  .")
     #git.stdin.write("programming\n")
     subprocess.run("git commit -m " + comment_info )
-    git = subprocess.Popen("git push -f  origin {}".format(branch_name),
+    git = subprocess.Popen("git push -f  origin {}:{}".format(local_branch_name,remote_branch_name),
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                         stdin=subprocess.PIPE,
@@ -89,7 +89,7 @@ def reset_rsa_private_aes_key(old_key,new_key):
          if "y" != input("will expose your private key ,are u sure(y|n)\n"):
             exit
     generate_private_key(private_key_text)
-    pushes("key_pair","rsa",SETTING_ITEM["rsa"]["git"]["branch"])
+    pushes("key_pair","rsa",SETTING_ITEM["rsa"]["git"]["localBranch"],SETTING_ITEM["rsa"]["git"]["branch"])
  
     print("reset sucessful! ")
 
@@ -110,7 +110,7 @@ def encrypt_pass(domain,msg):
     os.chdir(PASS_REPO_PATH)
     with open(domain ,mode="w") as f:
         f.write(cipher_text)
-    pushes(".", domain, SETTING_ITEM["pass"]["git"]["branch"])   
+    pushes(".", domain, SETTING_ITEM["rsa"]["git"]["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])   
 
 def decrypt_pass(domain,aes_key):
     domains = os.listdir(PASS_REPO_PATH)
