@@ -24,20 +24,23 @@
     - 修改 *passbox* 文件第一行(即:`#!/opt/conda/bin/python`)为您的python 解释器路径(终端运行`which python`,即可得到)
 <br>
 
-- 第一次使用该工具的话 :命令行 运行 `passbox init`  生成密钥和相关文件夹
+- 初次使用: 命令行 运行 `passbox init`  生成密钥和相关文件夹
   - 去 *pass_repo* 和 *key_pair*文件夹中,初始化git仓库，如果非*onlyLocal*配置的话, 需添加相对应的远程仓库(settings.json中配置好的)，配置验证信息,尝试push,确保通过
   - 考虑安全，强烈推荐 设置私钥密码 : `passbox reset - ${aesKey}` *aesKey*为你个人的aes 密钥
   <br>
-- 之前使用过，则只需执行`passbox pull`,从仓库拉下 我们的加密文件(存入文件夹*pass_repo*) 公私钥文件(存入文件夹 *key_pair*)
+
+- 迁移：则只需执行`passbox pull`,从仓库拉下 我们的加密文件(存入文件夹*pass_repo*) 公私钥文件(存入文件夹 *key_pair*)
   
 ### 使用
 
 - 程序都基于命令行方便操作
   - 重设私钥密码:`passbox reset ${oldKey} ${newKey}`
   
-  - 加密: `passbox enc ${name} ${aeskey}` *name*(网站域名或其他)*aeskey*(私钥密码)
-    - 在非*onlyLocal* 情况下 `passbox enc ${name} ${aeskey} --uplod=false` ,则不上传密文到远程仓库
-  - 解密: `passbox dec ${name} ${aeskey}` 密码为空时用 *-* 替代
+  - 加密
+    - 加密命令行: `passbox enc ${domain} ${msg}` *domain* (域名或其他，主要起标记作用) *msg* (待加密的信息)
+    - 加密文件: `passbox encfile ${filepath}` *filepath* 为文件路径
+    - 在非*onlyLocal* 情况下 ，以上命令后添加`--upload=false` ,则不上传密文到远程仓库
+  - 解密: `passbox dec ${domain} ${aeskey}`  *domain* (域名或文件名或其他) 密码为空时用 *-* 替代
 `
 
 ### 视频
