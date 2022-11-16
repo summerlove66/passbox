@@ -21,8 +21,8 @@ RSA_PRIVATE_KEY_FILE = os.path.join(RSA_PAIR_PATH, PRIVATE_KEY)
 RSA_PUBLIC_KEY_FILE = os.path.join(RSA_PAIR_PATH, PUBLIC_KEY)
 RSA_BEGIN_SYMBOL = "-----BEGIN RSA PRIVATE KEY-----\n"
 RSA_END_SYMBOL = "\n-----END RSA PRIVATE KEY-----"
-FILE_MARK ="file-passbox-"
-ENCRYPTED_FILE_MARK ="file-enc-passbox-"
+FILE_MARK = "file-passbox-"
+ENCRYPTED_FILE_MARK = "file-enc-passbox-"
 
 os.chdir(os.environ.get("PASSBOX"))
 
@@ -30,6 +30,7 @@ with open(SETTING_FILE) as f:
     SETTING_ITEM = json.load(f)
 
 # initlize rsa key pair
+
 
 @click.group()
 def cli():
@@ -39,6 +40,7 @@ def cli():
 def get_file(key_file):
     with open(key_file) as f:
         return f.read()
+
 
 def get_private_key_content():
     return get_file(RSA_PRIVATE_KEY_FILE).replace(RSA_BEGIN_SYMBOL, "").replace(RSA_END_SYMBOL, "")
@@ -50,17 +52,17 @@ def generate_private_key(aes_encrypted_content):
 
 
 def pushes(fold_path, comment_info, local_branch_name, remote_branch_name):
-    if not  SETTING_ITEM["onlyLocal"]:
+    if not SETTING_ITEM["onlyLocal"]:
         os.chdir(fold_path)
         subprocess.run("git add  .")
         # git.stdin.write("programming\n")
         subprocess.run("git commit -m " + comment_info)
         git = subprocess.Popen("git push -f  origin {}:{}".format(local_branch_name, remote_branch_name),
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            stdin=subprocess.PIPE,
-                            universal_newlines=True,
-                            bufsize=0,)
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               stdin=subprocess.PIPE,
+                               universal_newlines=True,
+                               bufsize=0,)
         # print("=====",git.stdout.read())
         # print("=====", git.stdin.read())
         # print("=====", git.stderr.read())
@@ -69,6 +71,8 @@ def pushes(fold_path, comment_info, local_branch_name, remote_branch_name):
         os.chdir("..")
 
 # get the original private key
+
+
 def get_rsa_private_key_from_aes_key(aes_key):
     if aes_key != "-":
         aesCryptor = AESCrypt(aes_key)
@@ -76,21 +80,25 @@ def get_rsa_private_key_from_aes_key(aes_key):
         return RSA_BEGIN_SYMBOL + aesCryptor.aes_decrypt(cipher_text) + RSA_END_SYMBOL
     return get_file(RSA_PRIVATE_KEY_FILE)
 
+
 def encrypt_text(msg):
     return encrypt_bytes(bytes(msg.encode("utf8")))
+
 
 def encrypt_bytes(data):
     res = bytearray()
     public_key = RSA.import_key(get_file(RSA_PUBLIC_KEY_FILE))
     cipher = PKCS1_cipher.new(public_key)
     for i in range(0, len(data), 200):
-        res +=cipher.encrypt(data[i :i + 200])
-    
+        res += cipher.encrypt(data[i:i + 200])
+
     return base64.b64encode(res).decode('utf-8')
+
 
 def decrypt_text(encrypt_msg, aes_key):
 
-    return decrypt_bytes(encrypt_msg,aes_key).decode('utf-8')
+    return decrypt_bytes(encrypt_msg, aes_key).decode('utf-8')
+
 
 def decrypt_bytes(data, aes_key):
     res = bytearray()
@@ -98,11 +106,12 @@ def decrypt_bytes(data, aes_key):
         get_rsa_private_key_from_aes_key(aes_key=aes_key))
     cipher = PKCS1_cipher.new(private_key)
     data = base64.b64decode(data)
-    for i in range(0, len(data) ,256):
-        res += cipher.decrypt(data[i :i+256], 0)
+    for i in range(0, len(data), 256):
+        res += cipher.decrypt(data[i:i+256], 0)
     return res
 
-def post_encrypted(domain,cipher_text,will_upload):
+
+def post_encrypted(domain, cipher_text, will_upload):
     os.chdir(PASS_REPO_PATH)
     with open(domain, mode="w") as f:
         f.write(cipher_text)
@@ -110,6 +119,7 @@ def post_encrypted(domain,cipher_text,will_upload):
         pushes(".", domain, SETTING_ITEM["rsa"]["git"]
                ["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])
     print("encrypt sucessful! ")
+
 
 @cli.command(name="init")
 def initlizer():
@@ -125,6 +135,7 @@ def initlizer():
     f.close()
 
     os.mkdir(PASS_REPO_PATH)
+
 
 @cli.command(name="pull")
 def pulls():
@@ -152,37 +163,37 @@ def reset_rsa_private_aes_key(old_key, new_key):
            ["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])
     print("reset sucessful! ")
 
+
 @cli.command(name="enc")
 @click.argument("domain")
 @click.argument("msg")
-@click.option("--upload", default=True, type=bool ,help="will upload?(true/false)" )
+@click.option("--upload", default=True, type=bool, help="will upload?(true/false)")
 def encrypt_text_handler(domain, msg, upload):
-    post_encrypted(domain, encrypt_text(msg),upload)
-
+    post_encrypted(domain, encrypt_text(msg), upload)
 
 
 @cli.command(name="encfile")
 @click.argument("file_path")
-@click.option("--upload", default=True, type=bool ,help="will upload?(true/false)" )
-def encrypt_file_handler(file_path ,upload):
+@click.option("--upload", default=True, type=bool, help="will upload?(true/false)")
+def encrypt_file_handler(file_path, upload):
     if is_binary(file_path):
-        with open(file_path,"rb") as f:
+        with open(file_path, "rb") as f:
             cipher_text = encrypt_bytes(f.read())
     else:
 
-        with open(file_path, encoding="utf8" ) as f:
+        with open(file_path, encoding="utf8") as f:
             cipher_text = encrypt_text(f.read())
-    
-    filename = FILE_MARK+ os.path.basename(file_path)
-    
-    post_encrypted(filename, cipher_text,upload)
+
+    filename = FILE_MARK + os.path.basename(file_path)
+
+    post_encrypted(filename, cipher_text, upload)
 
 
 @cli.command(name="dec")
 @click.argument("domain")
 @click.argument("aes_key")
-@click.option("--filename", default="", type=str ,help="if it generate a file ,what's the filename?" )
-def decrypt_handler(domain, aes_key ,filename):
+@click.option("--filename", default="", type=str, help="if it generate a file ,what's the filename?")
+def decrypt_handler(domain, aes_key, filename):
     domains = os.listdir(PASS_REPO_PATH)
     target_domains = [e for e in domains if domain in e]
     domain_count = len(target_domains)
@@ -199,19 +210,18 @@ def decrypt_handler(domain, aes_key ,filename):
         content = f.read()
         if target_domain.startswith("file-pass"):
             if filename == "":
-                filename = target_domain.replace(FILE_MARK,"")
-            with open(filename ,"wb") as g:
-                g.write(decrypt_bytes(content,aes_key))
+                filename = target_domain.replace(FILE_MARK, "")
+            with open(filename, "wb") as g:
+                g.write(decrypt_bytes(content, aes_key))
             print("Congratulations, decrypted sucessful")
-        else:       
+        else:
             print(decrypt_text(content, aes_key))
 
 
 if __name__ == '__main__':
     print(text2art("PassBox"))
-    #print(sys.argv)
+    # print(sys.argv)
     # funcs = {"dec": decrypt, "enc": encrypt_text, "encfile" :encrypt_file,
     #          "reset": reset_rsa_private_aes_key, "pull": pulls, "init": initlizer}
     # funcs[sys.argv[1]](*sys.argv[2:])
     cli()
-    
