@@ -23,6 +23,7 @@
     - 执行 `chmox +x passbox` 添加可执行权限
     - 修改 *passbox* 文件第一行(即:`#!/opt/conda/bin/python`)为您的python 解释器路径(终端运行`which python`,即可得到)
 <br>
+
 - 第一次使用该工具的话 :命令行 运行 `passbox init`  生成密钥和相关文件夹
   - 去 *pass_repo* 和 *key_pair*文件夹中,初始化git仓库，如果非*onlyLocal*配置的话, 需添加相对应的远程仓库(settings.json中配置好的)，配置验证信息,尝试push,确保通过
   - 考虑安全，强烈推荐 设置私钥密码 : `passbox reset - ${aesKey}` *aesKey*为你个人的aes 密钥
