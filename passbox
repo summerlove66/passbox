@@ -209,7 +209,7 @@ def decrypt_handler(domain, aes_key ,filename):
 
 if __name__ == '__main__':
     print(text2art("PassBox"))
-    print(sys.argv)
+    #print(sys.argv)
     # funcs = {"dec": decrypt, "enc": encrypt_text, "encfile" :encrypt_file,
     #          "reset": reset_rsa_private_aes_key, "pull": pulls, "init": initlizer}
     # funcs[sys.argv[1]](*sys.argv[2:])
