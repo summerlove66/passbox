@@ -1,5 +1,5 @@
 {
-    "onlyLocal": false,
+    "onlyLocal": true,
     "pass": {
         "git": {
             "remote": "git@bitbucket.org:user/xxxx.git",
