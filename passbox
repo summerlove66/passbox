@@ -139,6 +139,10 @@ def initlizer():
 
 @cli.command(name="pull")
 def pulls():
+    if os.path.exists(PASS_REPO_PATH) or os.path.exists(RSA_PAIR_PATH):
+        print("Warning: {} or {} dirctory is exists, please remove(backup if u need) it  then try again!".format(
+            PASS_REPO_PATH, RSA_PAIR_PATH))
+        exit()
     subprocess.run("git clone -b {} {} {}".format(
         SETTING_ITEM["rsa"]["git"]["branch"], SETTING_ITEM["rsa"]["git"]["remote"], RSA_PAIR_PATH))
     subprocess.run("git clone -b {} {} {}".format(
