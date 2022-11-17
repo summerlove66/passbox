@@ -41,8 +41,3 @@
     - 加密文件: `passbox encfile ${filepath}` *filepath* 为文件路径
     - 在非*onlyLocal* 情况下 ，以上命令后添加`--upload=false` ,则不上传密文到远程仓库
   - 解密: `passbox dec ${domain} ${aeskey}`  *domain* (域名或文件名或其他) 密码为空时用 *-* 替代
-`
-
-### 视频
-
-- <https://www.bilibili.com/video/BV1YG411F7c2/?vd_source=47e46f193d221683448c4f1464a82252>
