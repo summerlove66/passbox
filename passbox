@@ -4,7 +4,6 @@ import click
 from ast import arg
 import base64
 import os
-import sys
 import subprocess
 from art import *
 from aes_util import AESCrypt
@@ -28,8 +27,6 @@ os.chdir(os.environ.get("PASSBOX"))
 
 with open(SETTING_FILE) as f:
     SETTING_ITEM = json.load(f)
-
-# initlize rsa key pair
 
 
 @click.group()
@@ -71,8 +68,6 @@ def pushes(fold_path, comment_info, local_branch_name, remote_branch_name):
         os.chdir("..")
 
 # get the original private key
-
-
 def get_rsa_private_key_from_aes_key(aes_key):
     if aes_key != "-":
         aesCryptor = AESCrypt(aes_key)
@@ -120,7 +115,7 @@ def post_encrypted(domain, cipher_text, will_upload):
                ["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])
     print("encrypt sucessful! ")
 
-
+# initlize rsa key pair
 @cli.command(name="init")
 def initlizer():
     os.mkdir(RSA_PAIR_PATH)
