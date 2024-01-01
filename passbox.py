@@ -1,16 +1,44 @@
-#!/opt/conda/bin/python
 import json
 import click
-from ast import arg
 import base64
 import os
 import subprocess
-from art import *
 from aes_util import AESCrypt
 from Crypto.PublicKey import RSA
 from binaryornot.check import is_binary
 from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 
+
+VERSION = "0.10"
+LOGO =f"""
+ ____                    ____
+|  _ \   __ _  ___  ___ | __ )   ___  __  __
+| |_) | / _` |/ __|/ __||  _ \  / _ \ \ \/ /
+|  __/ | (_| |\__ \\__ \| |_) || (_) | >  <
+|_|     \__,_||___/|___/|____/  \___/ /_/\_\\
+    
+    
+version:{VERSION} author:summerlove66  since:2023.12 
+"""
+
+DEFAULT_SETTINGS ={
+    "onlyLocal": True,
+    "pass": {
+        "git": {
+            "remote": "git@github.com:user/xxxx.git",
+            "branch": "master",
+            "localBranch": "master"
+        }
+    },
+    "rsa": {
+        "git": {
+            "remote": "git@github.com:user/xxxxxxx.git",
+            "branch": "master",
+            "localBranch": "master"
+        }
+    }
+}
+CONFIG_ABS_PATH = os.path.join(os.path.expanduser("~") ,".passbox")
 SETTING_FILE = "settings.json"
 PASS_REPO_PATH = "pass_repo"
 RSA_PAIR_PATH = "key_pair"
@@ -23,16 +51,21 @@ RSA_END_SYMBOL = "\n-----END RSA PRIVATE KEY-----"
 FILE_MARK = "file-passbox-"
 ENCRYPTED_FILE_MARK = "file-enc-passbox-"
 
-os.chdir(os.environ.get("PASSBOX"))
+os.makedirs(CONFIG_ABS_PATH,exist_ok=True)
+os.chdir(CONFIG_ABS_PATH)
 
+if not os.path.exists(SETTING_FILE):
+    with open(SETTING_FILE,"w", encoding="utf8") as f:
+        json.dump(DEFAULT_SETTINGS,f)
+        
 with open(SETTING_FILE) as f:
     SETTING_ITEM = json.load(f)
 
 
 @click.group()
+@click.version_option(message=LOGO)
 def cli():
     pass
-
 
 def get_file(key_file):
     with open(key_file) as f:
@@ -60,11 +93,8 @@ def pushes(fold_path, comment_info, local_branch_name, remote_branch_name):
                                stdin=subprocess.PIPE,
                                universal_newlines=True,
                                bufsize=0,)
-        # print("=====",git.stdout.read())
-        # print("=====", git.stdin.read())
-        # print("=====", git.stderr.read())
         out, err = git.communicate()
-        print("+=====", out, err,)
+        click.echo(f"+===== {out} {err}")
         os.chdir("..")
 
 # get the original private key
@@ -113,7 +143,7 @@ def post_encrypted(domain, cipher_text, will_upload):
     if will_upload:
         pushes(".", domain, SETTING_ITEM["rsa"]["git"]
                ["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])
-    print("encrypt sucessful! ")
+    click.echo("encrypt sucessful! ")
 
 # initlize rsa key pair
 @cli.command(name="init")
@@ -160,7 +190,7 @@ def reset_rsa_private_aes_key(old_key, new_key):
     generate_private_key(private_key_text)
     pushes("key_pair", "rsa", SETTING_ITEM["rsa"]["git"]
            ["localBranch"], SETTING_ITEM["rsa"]["git"]["branch"])
-    print("reset sucessful! ")
+    click.echo("reset sucessful! ")
 
 
 @cli.command(name="enc")
@@ -197,14 +227,14 @@ def decrypt_handler(domain, aes_key, filename):
     target_domains = [e for e in domains if domain in e]
     domain_count = len(target_domains)
     if domain_count == 0:
-        print("domain not found!")
+        click.echo("domain not found!")
         return
     elif len(target_domains) > 1:
         target_domain = input("\n".join(target_domains) +
                               "\nchoose one form above :")
     else:
         target_domain = target_domains[0]
-    print("domain : ", target_domain)
+    click.echo("domain : " + target_domain)
     with open(os.path.join(PASS_REPO_PATH, target_domain)) as f:
         content = f.read()
         if target_domain.startswith("file-pass"):
@@ -217,10 +247,10 @@ def decrypt_handler(domain, aes_key, filename):
             print(decrypt_text(content, aes_key))
 
 
-if __name__ == '__main__':
-    print(text2art("PassBox"))
-    # print(sys.argv)
-    # funcs = {"dec": decrypt, "enc": encrypt_text, "encfile" :encrypt_file,
-    #          "reset": reset_rsa_private_aes_key, "pull": pulls, "init": initlizer}
-    # funcs[sys.argv[1]](*sys.argv[2:])
-    cli()
+# if __name__ == '__main__':
+#     print(text2art("PassBox"))
+#     # print(sys.argv)
+#     # funcs = {"dec": decrypt, "enc": encrypt_text, "encfile" :encrypt_file,
+#     #          "reset": reset_rsa_private_aes_key, "pull": pulls, "init": initlizer}
+#     # funcs[sys.argv[1]](*sys.argv[2:])
+#     cli()
